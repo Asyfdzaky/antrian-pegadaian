@@ -1,0 +1,185 @@
+/* style.css */
+:root {
+  --primary-color: #3aaa35;
+  --text-color: #333;
+  --bg-light: #f6fff4;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --radius: 12px;
+  --font-main: "Segoe UI", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-light);
+  margin: 0;
+  padding: 0;
+  color: var(--text-color);
+}
+
+header {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  box-shadow: var(--card-shadow);
+}
+
+header img {
+  height: 48px;
+  margin-right: 16px;
+}
+
+h1 {
+  font-size: 1.6em;
+  margin: 0;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.form-input {
+  margin-bottom: 18px;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.form-input input,
+.form-input select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: var(--radius);
+  box-sizing: border-box;
+  font-size: 1em;
+  transition: border-color 0.2s;
+}
+
+.form-input input:focus,
+.form-input select:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-input button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1em;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.form-input button:hover {
+  background-color: #31992f;
+}
+
+.antrian-list {
+  margin-top: 24px;
+}
+button.btnTambahCabang {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  margin-top: 10px;             
+  font-weight: 600;
+  font-size: 1em;
+  width: 100%;
+  transition: background-color 0.2s ease;
+}
+
+.antrian-item {
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 18px;
+  color: white;
+  box-shadow: var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: #999;
+}
+
+.antrian-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.antrian-item strong {
+  font-size: 1.3em;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.antrian-item .detail {
+  font-size: 1em;
+  line-height: 1.6;
+}
+
+.Gadai {
+  background-color: #2e7d32;
+}
+
+.Tebus {
+  background-color: #0277bd;
+}
+
+.Cicilan {
+  background-color: #f9a825;
+  color: black;
+}
+
+.KUR {
+  background-color: #8e24aa;
+}
+
+.Krasida {
+  background-color: #d84315;
+}
+
+button.aksi {
+  background-color: white;
+  color: #333;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button.aksi:hover {
+  background-color: #eee;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  h1 {
+    font-size: 1.3em;
+  }
+
+  .container {
+    padding: 16px;
+  }
+}

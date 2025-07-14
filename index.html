@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pemanggilan Antrian Pegadaian</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Pegadaian_logo_%282013%29.svg/2560px-Pegadaian_logo_%282013%29.svg.png"
+        alt="Pegadaian Logo"
+      />
+      <h1>Pemanggilan Antrian</h1>
+    </header>
+
+    <div class="container">
+      <div class="form-input">
+        <label>Pilih Cabang:</label>
+        <select id="kodeCabang">
+          <option disabled selected value="">-- Pilih Cabang --</option>
+        </select>
+      </div>
+
+      <div class="antrian-list" id="daftarAntrian"></div>
+    </div>
+
+    <audio
+      id="bellSound"
+      src="https://www.soundjay.com/buttons/sounds/button-3.mp3"
+      preload="auto"
+    ></audio>
+
+    <script type="module">
+      // firebase-config.js
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA4js_HDuC7Ke0MlJJjKc38jJ7_O4Wzktc",
+        authDomain: "antrian-pengadian.firebaseapp.com",
+        databaseURL:
+          "https://antrian-pengadian-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "antrian-pengadian",
+        storageBucket: "antrian-pengadian.appspot.com",
+        messagingSenderId: "59424089844",
+        appId: "1:59424089844:web:d18befeca434de5c6f20a1",
+        measurementId: "G-G73N69T296",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      const dropdown = document.getElementById("kodeCabang");
+      const list = document.getElementById("daftarAntrian");
+
+      function loadCabang() {
+        onValue(ref(db, "cabang_list"), (snap) => {
+          dropdown.innerHTML =
+            '<option disabled selected value="">-- Pilih Cabang --</option>';
+          const data = snap.val();
+          if (!data) return;
+          Object.keys(data).forEach((kode) => {
+            const opt = document.createElement("option");
+            opt.value = kode;
+            opt.textContent = kode;
+            dropdown.appendChild(opt);
+          });
+        });
+      }
+
+      function render(data, kode) {
+        list.innerHTML = "";
+        if (!data) return;
+
+        Object.entries(data).forEach(([nomor, val]) => {
+          const div = document.createElement("div");
+          div.className = `antrian-item ${val.jenis}`;
+          div.innerHTML = `
+          <strong>${nomor}</strong><br>
+          Nama: ${val.nama}<br>
+          Transaksi: ${val.jenis}<br><br>
+          <button class="aksi" onclick='panggil("${nomor}", "${val.nama}", "${val.jenis}")'>Panggil</button>
+          <button class="aksi" onclick='hapus("${kode}", "${nomor}")'>Selesai</button>
+        `;
+          list.appendChild(div);
+        });
+      }
+
+      window.panggil = function (nomor, nama, jenis) {
+        document.getElementById("bellSound").play();
+        setTimeout(() => {
+          const text = `Nomor antrian ${nomor}, atas nama ${nama}, transaksi ${jenis}. Silakan ke loket.`;
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = "id-ID";
+          speechSynthesis.speak(u);
+        }, 1500);
+      };
+
+      window.hapus = function (kode, nomor) {
+        set(ref(db, `antrian/${kode}/${nomor}`), null);
+      };
+
+      dropdown.addEventListener("change", (e) => {
+        const kode = e.target.value;
+        onValue(ref(db, `antrian/${kode}`), (snap) => {
+          render(snap.val(), kode);
+        });
+      });
+
+      loadCabang();
+    </script>
+  </body>
+</html>

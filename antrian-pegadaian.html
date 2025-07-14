@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Input Antrian Pegadaian</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Pegadaian_logo_%282013%29.svg/2560px-Pegadaian_logo_%282013%29.svg.png"
+        alt="Pegadaian Logo"
+      />
+      <h1>Input Antrian Pegadaian</h1>
+    </header>
+
+    <div class="container">
+      <div class="form-input">
+        <label>Tambah Cabang Baru:</label>
+        <input type="text" id="cabangBaruInput" placeholder="Contoh: CBG06" />
+        <button class="btnTambahCabang" onclick="tambahCabang()">
+          Tambah Cabang
+        </button>
+      </div>
+
+      <div class="form-input">
+        <label>Kode Cabang:</label>
+        <select id="kodeCabang">
+          <option disabled selected value="">-- Pilih Cabang --</option>
+        </select>
+      </div>
+
+      <div class="form-input">
+        <label>Nama Nasabah:</label>
+        <input type="text" id="namaNasabah" placeholder="Contoh: Ibu Siti" />
+      </div>
+
+      <div class="form-input">
+        <label>Jenis Transaksi:</label>
+        <select id="jenisTransaksi">
+          <option value="Gadai">Gadai</option>
+          <option value="Tebus">Tebus</option>
+          <option value="Cicilan">Cicilan</option>
+          <option value="KUR">KUR</option>
+          <option value="Krasida">Krasida</option>
+        </select>
+      </div>
+
+      <div class="form-input">
+        <button id="btnTambahAntrian" onclick="tambahAntrian()">
+          Tambah Antrian
+        </button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        get,
+        onValue,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyA4js_HDuC7Ke0MlJJjKc38jJ7_O4Wzktc",
+        authDomain: "antrian-pengadian.firebaseapp.com",
+        databaseURL:
+          "https://antrian-pengadian-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "antrian-pengadian",
+        storageBucket: "antrian-pengadian.appspot.com",
+        messagingSenderId: "59424089844",
+        appId: "1:59424089844:web:d18befeca434de5c6f20a1",
+        measurementId: "G-G73N69T296",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+
+      const dropdown = document.getElementById("kodeCabang");
+
+      async function tambahCabang() {
+        const input = document.getElementById("cabangBaruInput");
+        const kode = input.value.trim().toUpperCase();
+
+        if (!kode) return alert("⚠️ Masukkan kode cabang terlebih dahulu.");
+
+        try {
+          await set(ref(db, `cabang_list/${kode}`), true);
+          alert(`✅ Cabang ${kode} berhasil ditambahkan.`);
+          input.value = "";
+        } catch (error) {
+          alert("❌ Gagal menambahkan cabang. Silakan coba lagi.");
+          console.error(error);
+        }
+      }
+
+      function loadCabang() {
+        onValue(ref(db, "cabang_list"), (snap) => {
+          dropdown.innerHTML =
+            '<option disabled selected value="">-- Pilih Cabang --</option>';
+          const data = snap.val();
+          if (!data) return;
+          Object.keys(data).forEach((kode) => {
+            const opt = document.createElement("option");
+            opt.value = kode;
+            opt.textContent = kode;
+            dropdown.appendChild(opt);
+          });
+        });
+      }
+
+      async function getNextNomor(cabang) {
+        const last = await get(ref(db, `nomor_terakhir/${cabang}`));
+        const lastNomor = last.exists() ? last.val() : "A000";
+        const next =
+          "A" +
+          (parseInt(lastNomor.substring(1)) + 1).toString().padStart(3, "0");
+        return next;
+      }
+
+      async function tambahAntrian() {
+        const kode = dropdown.value;
+        const nama = document.getElementById("namaNasabah").value.trim();
+        const jenis = document.getElementById("jenisTransaksi").value;
+
+        if (!kode || !nama)
+          return alert("⚠️ Lengkapi semua data terlebih dahulu!");
+
+        try {
+          const nomor = await getNextNomor(kode);
+          await set(ref(db, `antrian/${kode}/${nomor}`), {
+            nama,
+            jenis,
+            timestamp: Date.now(),
+          });
+          await set(ref(db, `nomor_terakhir/${kode}`), nomor);
+
+          alert(`✅ Antrian ${nomor} berhasil ditambahkan.`);
+          document.getElementById("namaNasabah").value = "";
+        } catch (error) {
+          alert("❌ Gagal menambahkan antrian. Silakan coba lagi.");
+          console.error(error);
+        }
+      }
+
+      loadCabang();
+      // Buat fungsi bisa diakses dari HTML onclick
+      window.tambahAntrian = tambahAntrian;
+      window.tambahCabang = tambahCabang;
+    </script>
+  </body>
+</html>
