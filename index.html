@@ -84,7 +84,7 @@
           const div = document.createElement("div");
           div.className = `antrian-item ${val.jenis}`;
           div.innerHTML = `
-          <strong>${nomor}</strong><br>
+          
           Nama: ${val.nama}<br>
           Transaksi: ${val.jenis}<br><br>
           <button class="aksi" onclick='panggil("${nomor}", "${val.nama}", "${val.jenis}")'>Panggil</button>
@@ -97,9 +97,9 @@
       window.panggil = function (nomor, nama, jenis) {
         document.getElementById("bellSound").play();
         setTimeout(() => {
-          const text = `Nomor antrian ${nomor}, atas nama ${nama}, transaksi ${jenis}. Silakan ke loket.`;
+          const text = `number ${nomor}, under the name ${nama}, transaction ${jenis}. Please proceed to the counter.`;
           const u = new SpeechSynthesisUtterance(text);
-          u.lang = "id-ID";
+          u.lang = "en-US";
           speechSynthesis.speak(u);
         }, 1500);
       };
