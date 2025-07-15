@@ -23,6 +23,15 @@
           Tambah Cabang
         </button>
       </div>
+      <div class="form-input">
+        <label>Hapus Cabang:</label>
+        <select id="kodeCabangHapus">
+          <option disabled selected value="">-- Pilih Cabang --</option>
+        </select>
+        <button class="btnHapusCabang" onclick="hapusCabang()">
+          Hapus Cabang
+        </button>
+      </div>
 
       <div class="form-input">
         <label>Kode Cabang:</label>
@@ -96,18 +105,50 @@
           console.error(error);
         }
       }
+      async function hapusCabang() {
+        const dropdownHapus = document.getElementById("kodeCabangHapus");
+        const kode = dropdownHapus.value;
+
+        if (!kode) return alert("⚠️ Pilih cabang yang ingin dihapus.");
+
+        const konfirmasi = confirm(
+          `⚠️ Apakah Anda yakin ingin menghapus cabang ${kode}? Semua data antrian juga akan dihapus.`
+        );
+
+        if (!konfirmasi) return;
+
+        try {
+          // Hapus dari daftar cabang
+          await set(ref(db, `cabang_list/${kode}`), null);
+          // Hapus data antrian
+          await set(ref(db, `antrian/${kode}`), null);
+          // Hapus nomor terakhir
+          await set(ref(db, `nomor_terakhir/${kode}`), null);
+
+          alert(`✅ Cabang ${kode} berhasil dihapus.`);
+        } catch (error) {
+          alert("❌ Gagal menghapus cabang. Silakan coba lagi.");
+          console.error(error);
+        }
+      }
 
       function loadCabang() {
         onValue(ref(db, "cabang_list"), (snap) => {
           dropdown.innerHTML =
             '<option disabled selected value="">-- Pilih Cabang --</option>';
+          const dropdownHapus = document.getElementById("kodeCabangHapus");
+          dropdownHapus.innerHTML =
+            '<option disabled selected value="">-- Pilih Cabang --</option>';
+
           const data = snap.val();
           if (!data) return;
           Object.keys(data).forEach((kode) => {
             const opt = document.createElement("option");
             opt.value = kode;
             opt.textContent = kode;
+
             dropdown.appendChild(opt);
+            dropdownHapus.appendChild(opt.cloneNode(true));
           });
         });
       }
@@ -150,6 +191,7 @@
       // Buat fungsi bisa diakses dari HTML onclick
       window.tambahAntrian = tambahAntrian;
       window.tambahCabang = tambahCabang;
+      window.hapusCabang = hapusCabang;
     </script>
   </body>
 </html>
